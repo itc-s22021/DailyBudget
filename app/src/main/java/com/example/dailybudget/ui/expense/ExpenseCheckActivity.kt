@@ -7,9 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dailybudget.DailyBudget
+import com.example.dailybudget.DailyBudgetAdapter
 import com.example.dailybudget.R
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ExpenseCheckActivity : AppCompatActivity() {
 
@@ -18,7 +19,7 @@ class ExpenseCheckActivity : AppCompatActivity() {
         setContentView(R.layout.activity_expense_check)
 
         // RecyclerView の設定
-        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
+        val recyclerView = findViewById<RecyclerView>(R.id.calendarView) // ID 修正
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // データ作成（1日毎の予算を計算）
@@ -43,15 +44,25 @@ class ExpenseCheckActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("DailyBudgetPrefs", Context.MODE_PRIVATE)
         val totalBudget = sharedPreferences.getInt("budget", 30000) // デフォルト: 30,000円
         val salaryDay = sharedPreferences.getInt("salaryDay", 25) // デフォルト: 25日
-        val currentDate = LocalDate.now()
 
-        // 現在の日付から次の給料日までの日数を計算
-        val nextSalaryDate = if (currentDate.dayOfMonth > salaryDay) {
-            currentDate.plusMonths(1).withDayOfMonth(salaryDay)
-        } else {
-            currentDate.withDayOfMonth(salaryDay)
+        // 現在の日付を Calendar を使って取得
+        val calendar = Calendar.getInstance()
+        val today = Calendar.getInstance() // 元の日付を保持
+        val currentDay = today.get(Calendar.DAY_OF_MONTH)
+
+        // 次の給料日までの日数を計算
+        if (currentDay > salaryDay) {
+            calendar.add(Calendar.MONTH, 1)
         }
-        val daysUntilNextSalary = ChronoUnit.DAYS.between(currentDate, nextSalaryDate).toInt()
+        calendar.set(Calendar.DAY_OF_MONTH, salaryDay)
+
+        val daysUntilNextSalary = ((calendar.timeInMillis - today.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
+
+        // 日数が0以下の場合のエラー回避
+        if (daysUntilNextSalary <= 0) {
+            Toast.makeText(this, "給料日設定が不正です", Toast.LENGTH_SHORT).show()
+            return emptyList()
+        }
 
         // 1日あたりの予算を計算
         val dailyBudgetAmount = totalBudget / daysUntilNextSalary
@@ -59,10 +70,12 @@ class ExpenseCheckActivity : AppCompatActivity() {
         // リストを作成
         val dailyBudgets = mutableListOf<DailyBudget>()
         for (i in 0 until daysUntilNextSalary) {
-            val date = currentDate.plusDays(i.toLong())
+            val currentDate = today.clone() as Calendar
+            currentDate.add(Calendar.DAY_OF_YEAR, i) // i日後に進める
+            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(currentDate.time)
             dailyBudgets.add(
                 DailyBudget(
-                    date = date.toString(), // 日付を文字列として追加
+                    date = date,
                     budget = dailyBudgetAmount,
                     spent = 0 // 初期状態では支出は0
                 )

@@ -6,35 +6,38 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-// DailyBudgetAdapterクラス
 class DailyBudgetAdapter(
-    private val dailyBudgets: List<DailyBudget> // 1日ごとの支出予定金額のリスト
+    private val dailyBudgets: List<DailyBudget>,
+    private val onItemClicked: (DailyBudget) -> Unit
 ) : RecyclerView.Adapter<DailyBudgetAdapter.DailyBudgetViewHolder>() {
 
-    // ViewHolderの定義
-    class DailyBudgetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val dateTextView: TextView = itemView.findViewById(R.id.dateTextView) // 日付
-        val budgetTextView: TextView = itemView.findViewById(R.id.budgetTextView) // 支出予定金額
-    }
-
-    // onCreateViewHolder: ViewHolderを生成
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyBudgetViewHolder {
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_daily_budget, parent, false) // アイテムレイアウトを膨らませる
-        return DailyBudgetViewHolder(itemView)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_daily_budget, parent, false)
+        return DailyBudgetViewHolder(view)
     }
 
-    // onBindViewHolder: ViewHolderにデータをバインド
     override fun onBindViewHolder(holder: DailyBudgetViewHolder, position: Int) {
-        val dailyBudget = dailyBudgets[position] // 対象の支出データ
-
-        // 日付と支出金額を設定
-        holder.dateTextView.text = dailyBudget.date
-        holder.budgetTextView.text = dailyBudget.budget.toString()
+        val dailyBudget = dailyBudgets[position]
+        holder.bind(dailyBudget)
     }
 
-    // アイテム数を返す
-    override fun getItemCount(): Int {
-        return dailyBudgets.size
+    override fun getItemCount(): Int = dailyBudgets.size
+
+    inner class DailyBudgetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
+        private val budgetTextView: TextView = itemView.findViewById(R.id.budgetTextView)
+        private val spentTextView: TextView = itemView.findViewById(R.id.spentTextView)
+        private val differenceTextView: TextView = itemView.findViewById(R.id.differenceTextView)
+
+        fun bind(dailyBudget: DailyBudget) {
+            dateTextView.text = dailyBudget.date
+            budgetTextView.text = "¥${dailyBudget.budget}"
+            spentTextView.text = "¥${dailyBudget.spent}"
+            differenceTextView.text = "差額: ¥${dailyBudget.getDifference()}"
+
+            itemView.setOnClickListener {
+                onItemClicked(dailyBudget)
+            }
+        }
     }
 }
