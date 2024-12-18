@@ -1,4 +1,4 @@
-package com.example.dailybudget.ui
+package com.example.dailybudget.ui.expense
 
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
