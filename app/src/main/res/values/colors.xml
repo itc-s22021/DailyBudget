@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 基本色 -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- 状態色 -->
+    <color name="errorRed">#FF0000</color> <!-- エラー時の赤 -->
+    <color name="successGreen">#008000</color> <!-- 成功時の緑 -->
+
+    <!-- 予算状態 -->
+    <color name="over_budget">#FF0000</color> <!-- 予算オーバーの赤 -->
+    <color name="under_budget">#00FF00</color> <!-- 予算以下の緑 -->
+
+    <!-- アプリテーマ色 -->
+    <color name="primaryColor">#4CAF50</color> <!-- プライマリー（グリーン） -->
+    <color name="secondaryColor">#FF9800</color> <!-- セカンダリー（オレンジ） -->
+</resources>

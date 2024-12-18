@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 月の予算を入力するフィールド -->
+    <EditText
+        android:id="@+id/budgetInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="月の予算を入力"
+        android:inputType="numberDecimal"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 給料日を選択するフィールド -->
+    <TextView
+        android:id="@+id/salaryDateInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="給料日を選択"
+        android:background="@android:drawable/edit_text"
+        android:padding="12dp"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 給料日が土日祝の場合の選択ボタン -->
+    <Button
+        android:id="@+id/paymentOptionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="前払い/後払いを選択"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 設定を保存するボタン -->
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="保存"
+        android:textSize="18sp" />
+
+</LinearLayout>

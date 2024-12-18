@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">DailyBudget</string>
+    <string name="salary_date_format">%1$d年%2$d月%3$d日</string>
+    <string name="daily_budget">予算: %1$.2f円</string>
+    <string name="daily_expense">支出: %1$.2f円</string>
+    <string name="daily_budget_text">予算: %1$d円</string>
+    <string name="date_text">日付: %s</string>
+    <string name="daily_expense_text">支出: %1$d円</string>
+    <string name="monthly_budget">月間予算: ¥%1$d</string>
+    <string name="total_expense">総支出: ¥%1$d</string>
+    <string name="redistributed_budget">再分配後の予算: ¥%1$d</string>
+    <string name="budget_setting">予算設定</string>
+    <string name="expense_check">支出確認</string>
+</resources>
