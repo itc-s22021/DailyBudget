@@ -1,13 +1,12 @@
 package com.example.dailybudget.ui.expense
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,13 +21,14 @@ class ExpenseCheckActivity : AppCompatActivity() {
     private val REQUEST_CODE_SPEECH_INPUT = 100
     private lateinit var dailyBudgets: MutableList<DailyBudget>
     private lateinit var adapter: DailyBudgetAdapter
+    private var selectedDailyBudget: DailyBudget? = null // 選択された日付を保持
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense_check)
 
         // RecyclerView の設定
-        val recyclerView = findViewById<RecyclerView>(R.id.calendarView) // ID 修正
+        val recyclerView = findViewById<RecyclerView>(R.id.calendarView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // データ作成（1日毎の予算を計算）
@@ -38,15 +38,50 @@ class ExpenseCheckActivity : AppCompatActivity() {
         adapter = DailyBudgetAdapter(
             dailyBudgets,
             onItemClicked = { dailyBudget ->
-                showManualInputDialog(dailyBudget)
+                selectedDailyBudget = dailyBudget
+                showInputMethodDialog() // 入力方法選択ダイアログを表示
             }
         )
         recyclerView.adapter = adapter
+    }
 
-        // 音声入力ボタン
-        findViewById<Button>(R.id.voiceInputButton).setOnClickListener {
-            startVoiceInput()
-        }
+    /**
+     * 入力方法選択ダイアログを表示する
+     */
+    private fun showInputMethodDialog() {
+        val options = arrayOf("音声入力", "手動入力")
+        AlertDialog.Builder(this)
+            .setTitle("入力方法を選択してください")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> startVoiceInput() // 音声入力
+                    1 -> showManualInputDialog() // 手動入力
+                }
+            }
+            .setNegativeButton("キャンセル", null)
+            .show()
+    }
+
+    /**
+     * 手動入力ダイアログを表示する
+     */
+    private fun showManualInputDialog() {
+        val editText = EditText(this)
+        editText.hint = "支出額を入力してください"
+
+        AlertDialog.Builder(this)
+            .setTitle("手動入力")
+            .setView(editText)
+            .setPositiveButton("OK") { _, _ ->
+                val inputText = editText.text.toString().toIntOrNull()
+                if (inputText != null) {
+                    updateDailyBudget(inputText)
+                } else {
+                    Toast.makeText(this, "数値を入力してください", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("キャンセル", null)
+            .show()
     }
 
     /**
@@ -78,40 +113,15 @@ class ExpenseCheckActivity : AppCompatActivity() {
     }
 
     /**
-     * 手動入力ダイアログを表示する
-     */
-    private fun showManualInputDialog(dailyBudget: DailyBudget) {
-        val editText = EditText(this)
-        editText.hint = "支出額を入力してください"
-
-        AlertDialog.Builder(this)
-            .setTitle("${dailyBudget.date} の支出額")
-            .setView(editText)
-            .setPositiveButton("保存") { _, _ ->
-                val input = editText.text.toString().toIntOrNull()
-                if (input != null) {
-                    dailyBudget.spent = input
-                    adapter.notifyDataSetChanged()
-                } else {
-                    Toast.makeText(this, "無効な入力です", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("キャンセル", null)
-            .show()
-    }
-
-    /**
-     * 音声入力の結果を反映する
+     * 入力結果を選択された日に反映する
      */
     private fun updateDailyBudget(spentAmount: Int) {
-        // 最新の支出日（例として最初の日を更新する）
-        val todayBudget = dailyBudgets.firstOrNull()
-        if (todayBudget != null) {
-            todayBudget.spent = spentAmount
+        selectedDailyBudget?.let { dailyBudget ->
+            dailyBudget.spent = spentAmount
             adapter.notifyDataSetChanged()
-            Toast.makeText(this, "支出を更新しました", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "日付データがありません", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "${dailyBudget.date} の支出を更新しました", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            Toast.makeText(this, "日付が選択されていません", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -123,29 +133,41 @@ class ExpenseCheckActivity : AppCompatActivity() {
         val totalBudget = sharedPreferences.getInt("budget", 30000)
         val salaryDay = sharedPreferences.getInt("salaryDay", 25)
 
-        val calendar = Calendar.getInstance()
         val today = Calendar.getInstance()
         val currentDay = today.get(Calendar.DAY_OF_MONTH)
 
-        if (currentDay > salaryDay) {
-            calendar.add(Calendar.MONTH, 1)
+        // 給料日の設定が正しいか確認
+        if (salaryDay < 1 || salaryDay > today.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+            Toast.makeText(this, "給料日の設定が不正です (1-${today.getActualMaximum(Calendar.DAY_OF_MONTH)})", Toast.LENGTH_LONG).show()
+            return emptyList()
         }
-        calendar.set(Calendar.DAY_OF_MONTH, salaryDay)
 
-        val daysUntilNextSalary = ((calendar.timeInMillis - today.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
+        // 次の給料日を計算
+        val nextSalaryDate = Calendar.getInstance()
+        if (currentDay > salaryDay) {
+            nextSalaryDate.add(Calendar.MONTH, 1)
+        }
+        nextSalaryDate.set(Calendar.DAY_OF_MONTH, salaryDay)
 
+        // 日数を計算（小数切り上げを考慮）
+        val daysUntilNextSalary = ((nextSalaryDate.timeInMillis - today.timeInMillis + (1000 * 60 * 60 * 24 - 1)) / (1000 * 60 * 60 * 24)).toInt()
+
+        // 日数が0以下の場合はエラー
         if (daysUntilNextSalary <= 0) {
             Toast.makeText(this, "給料日設定が不正です", Toast.LENGTH_SHORT).show()
             return emptyList()
         }
 
+        // 1日あたりの予算を計算
         val dailyBudgetAmount = totalBudget / daysUntilNextSalary
 
+        // 日毎の予算リストを作成
         val dailyBudgets = mutableListOf<DailyBudget>()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         for (i in 0 until daysUntilNextSalary) {
             val currentDate = today.clone() as Calendar
             currentDate.add(Calendar.DAY_OF_YEAR, i)
-            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(currentDate.time)
+            val date = dateFormat.format(currentDate.time)
             dailyBudgets.add(
                 DailyBudget(
                     date = date,
