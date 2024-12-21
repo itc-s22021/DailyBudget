@@ -7,21 +7,36 @@
     android:gravity="center"
     android:weightSum="2">
 
+    <!-- Daily Budget タイトル部分 -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="48dp"
+        android:gravity="center"
+        android:text="Daily Budget"
+        android:textColor="@android:color/black"
+        android:textSize="64sp"
+    android:textStyle="bold" />
+
+    <!-- 予算設定ボタン -->
     <Button
         android:id="@+id/budgetSettingButton"
         android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    android:text="@string/budget_setting"
-    android:padding="16dp"
-    android:textSize="18sp"/>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/budget_setting"
+        android:padding="16dp"
+        android:textSize="18sp"/>
 
+    <!-- 支出確認ボタン -->
     <Button
         android:id="@+id/expenseCheckButton"
         android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/expense_check"
-    android:textSize="18sp"
-    android:padding="16dp"/>
+        android:layout_height="wrap_content"
+        android:text="@string/expense_check"
+        android:textSize="18sp"
+        android:padding="16dp"/>
 
 </LinearLayout>

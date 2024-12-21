@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:gravity="center"> <!-- ここで中央揃えを指定 -->
 
     <!-- 月の予算を入力するフィールド -->
     <EditText

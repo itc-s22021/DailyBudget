@@ -7,7 +7,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.dailybudget.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,6 +21,20 @@ class BudgetSettingActivity : AppCompatActivity() {
         val salaryDateInput = findViewById<TextView>(R.id.salaryDateInput)
         val paymentOptionButton = findViewById<Button>(R.id.paymentOptionButton)
         val saveButton = findViewById<Button>(R.id.saveButton)
+
+        // SharedPreferencesのインスタンス
+        val sharedPreferences = getSharedPreferences("BudgetPreferences", MODE_PRIVATE)
+
+        // 保存されているデータをロードしてセット
+        val savedBudget = sharedPreferences.getString("budget", "")
+        val savedSalaryDate = sharedPreferences.getString("salaryDate", "")
+
+        if (!savedBudget.isNullOrEmpty()) {
+            budgetInput.setText(savedBudget)
+        }
+        if (!savedSalaryDate.isNullOrEmpty()) {
+            salaryDateInput.text = savedSalaryDate
+        }
 
         // 給料日選択ボタンをクリックしたときの動作
         salaryDateInput.setOnClickListener {
