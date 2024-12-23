@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.example.dailybudget.ui.expense.ExpenseCheckActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,6 +13,10 @@ class MainActivity : AppCompatActivity() {
 
         val budgetSettingButton: Button = findViewById(R.id.budgetSettingButton)
         val expenseCheckButton: Button = findViewById(R.id.expenseCheckButton)
+        expenseCheckButton.setOnClickListener {
+            val intent = Intent(this, ExpenseCheckActivity::class.java)
+            startActivity(intent)
+        }
 
         budgetSettingButton.setOnClickListener {
             startActivity(Intent(this, BudgetSettingActivity::class.java))

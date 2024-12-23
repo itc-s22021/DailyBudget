@@ -16,16 +16,13 @@ class BudgetSettingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_budget_setting)
 
-        // 各UIコンポーネントを取得
         val budgetInput = findViewById<EditText>(R.id.budgetInput)
         val salaryDateInput = findViewById<TextView>(R.id.salaryDateInput)
         val paymentOptionButton = findViewById<Button>(R.id.paymentOptionButton)
         val saveButton = findViewById<Button>(R.id.saveButton)
 
-        // SharedPreferencesのインスタンス
         val sharedPreferences = getSharedPreferences("BudgetPreferences", MODE_PRIVATE)
 
-        // 保存されているデータをロードしてセット
         val savedBudget = sharedPreferences.getString("budget", "")
         val savedSalaryDate = sharedPreferences.getString("salaryDate", "")
 
@@ -36,12 +33,10 @@ class BudgetSettingActivity : AppCompatActivity() {
             salaryDateInput.text = savedSalaryDate
         }
 
-        // 給料日選択ボタンをクリックしたときの動作
         salaryDateInput.setOnClickListener {
             showDatePickerDialog(salaryDateInput)
         }
 
-        // 前払い/後払い選択ボタンをクリックしたときの動作
         paymentOptionButton.setOnClickListener {
             val salaryDate = salaryDateInput.text.toString()
             if (salaryDate.isEmpty()) {
@@ -56,7 +51,6 @@ class BudgetSettingActivity : AppCompatActivity() {
             }
         }
 
-        // 保存ボタンをクリックしたときの動作
         saveButton.setOnClickListener {
             val budget = budgetInput.text.toString()
             val salaryDate = salaryDateInput.text.toString()
@@ -71,12 +65,19 @@ class BudgetSettingActivity : AppCompatActivity() {
             }
 
             saveBudgetAndSalaryDate(budget, salaryDate)
-            Toast.makeText(this, "設定が保存されました", Toast.LENGTH_SHORT).show()
+
+            // 分配金額を計算して表示
+            val dailyAmount = calculateDailyBudget(budget.toDouble(), salaryDate)
+            if (dailyAmount != null) {
+                Toast.makeText(this, "1日あたりの金額: ¥${"%.2f".format(dailyAmount)}", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "分配金額の計算に失敗しました", Toast.LENGTH_SHORT).show()
+            }
+
             finish()
         }
     }
 
-    // カレンダーダイアログを表示する関数
     private fun showDatePickerDialog(targetView: TextView) {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -94,7 +95,6 @@ class BudgetSettingActivity : AppCompatActivity() {
         datePickerDialog.show()
     }
 
-    // 給料日が土日祝かどうかを判定する関数
     private fun isSalaryDateHoliday(salaryDate: String): Boolean {
         val date = parseDate(salaryDate) ?: return false
         val calendar = Calendar.getInstance()
@@ -102,16 +102,14 @@ class BudgetSettingActivity : AppCompatActivity() {
         return isHoliday(calendar)
     }
 
-    // 祝日と土日を判定する関数
     private fun isHoliday(calendar: Calendar): Boolean {
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         val isWeekend = dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
 
-        // 固定祝日を追加（簡易例）
         val holidays = listOf(
-            "2024-01-01", // 元日
-            "2024-02-11", // 建国記念の日
-            "2024-02-23"  // 天皇誕生日
+            "2024-01-01",
+            "2024-02-11",
+            "2024-02-23"
         )
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -120,7 +118,6 @@ class BudgetSettingActivity : AppCompatActivity() {
         return isWeekend || holidays.contains(formattedDate)
     }
 
-    // 前払い・後払いの選択ダイアログを表示する関数
     private fun showPaymentOptionDialog() {
         val options = arrayOf("前払い", "後払い")
         val builder = android.app.AlertDialog.Builder(this)
@@ -133,7 +130,6 @@ class BudgetSettingActivity : AppCompatActivity() {
         builder.show()
     }
 
-    // 入力された予算と給料日を保存する関数
     private fun saveBudgetAndSalaryDate(budget: String, salaryDate: String) {
         val sharedPreferences = getSharedPreferences("BudgetPreferences", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -142,7 +138,24 @@ class BudgetSettingActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    // 日付文字列を解析する関数
+    private fun calculateDailyBudget(budget: Double, salaryDate: String): Double? {
+        val currentDate = Calendar.getInstance().time
+        val nextSalaryDate = parseDate(salaryDate) ?: return null
+
+        if (nextSalaryDate.before(currentDate)) {
+            return null // 給料日が過去の場合、計算しない
+        }
+
+        val differenceInMillis = nextSalaryDate.time - currentDate.time
+        val daysUntilSalary = (differenceInMillis / (1000 * 60 * 60 * 24)).toInt()
+
+        return if (daysUntilSalary > 0) {
+            budget / daysUntilSalary
+        } else {
+            null
+        }
+    }
+
     private fun parseDate(dateString: String): Date? {
         return try {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

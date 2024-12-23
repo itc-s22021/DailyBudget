@@ -3,44 +3,33 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_marginBottom="8dp">
+    android:padding="8dp">
 
-    <!-- 日付表示 -->
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2024-12-01"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:text="Date"
+        android:textSize="16sp" />
 
-    <!-- 支出予定金額 -->
     <TextView
         android:id="@+id/budgetTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="¥0"
-        android:textSize="14sp"
-        android:layout_marginBottom="4dp"/>
+        android:text="Budget"
+        android:textSize="16sp" />
 
-    <!-- 実際の支出 -->
     <TextView
         android:id="@+id/spentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="¥0"
-        android:textSize="14sp"
-        android:layout_marginBottom="4dp"/>
+        android:text="Spent"
+        android:textSize="16sp" />
 
-    <!-- 差額 -->
     <TextView
         android:id="@+id/differenceTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="差額: ¥0"
-        android:textSize="14sp"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="4dp"/>
+        android:text="Difference"
+        android:textSize="16sp" />
 </LinearLayout>
