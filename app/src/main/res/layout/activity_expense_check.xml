@@ -12,12 +12,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2024年12月23日"
-        android:textSize="18sp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/todaySpendingTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="24sp"
+    android:layout_marginBottom="24dp"
+    app:layout_constraintBottom_toTopOf="@+id/todaySpendingTextView"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
     <!-- 今日の支出額 -->
     <TextView
@@ -25,13 +25,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="¥0"
-        android:textSize="24sp"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/todayBudgetTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todayDateTextView" />
+        android:textSize="30sp"
+    android:textColor="@android:color/black"
+    android:layout_marginBottom="24dp"
+    app:layout_constraintBottom_toTopOf="@+id/todayBudgetTextView"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/todayDateTextView" />
 
     <!-- 今日の予算 -->
     <TextView
@@ -39,45 +39,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="今日の予算: ¥0"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintBottom_toTopOf="@+id/reallocateButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todaySpendingTextView" />
-
-    <!-- 再分配ボタン -->
-    <Button
-        android:id="@+id/reallocateButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="再分配"
-        app:layout_constraintBottom_toTopOf="@+id/voiceInputButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todayBudgetTextView" />
+        android:textSize="24sp"
+    android:textColor="@android:color/black"
+    android:layout_marginBottom="40dp"
+    app:layout_constraintBottom_toTopOf="@+id/voiceInputButton"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/todaySpendingTextView" />
 
     <!-- 音声入力ボタン -->
     <Button
         android:id="@+id/voiceInputButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="音声入力"
-        app:layout_constraintBottom_toTopOf="@+id/manualInputButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reallocateButton" />
+        android:layout_width="200dp"
+    android:layout_height="60dp"
+    android:text="音声入力"
+    android:textSize="18sp"
+    app:layout_constraintBottom_toTopOf="@+id/manualInputButton"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/todayBudgetTextView" />
 
-    <!-- 手動入力ボタン -->
+
     <Button
         android:id="@+id/manualInputButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="手動入力"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/voiceInputButton" />
+        android:layout_width="200dp"
+    android:layout_height="60dp"
+    android:text="手動入力"
+    android:textSize="18sp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/voiceInputButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

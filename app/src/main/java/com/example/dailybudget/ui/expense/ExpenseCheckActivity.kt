@@ -30,7 +30,6 @@ class ExpenseCheckActivity : AppCompatActivity() {
         val todayDateTextView: TextView = findViewById(R.id.todayDateTextView)
         val todaySpendingTextView: TextView = findViewById(R.id.todaySpendingTextView)
         val todayBudgetTextView: TextView = findViewById(R.id.todayBudgetTextView)
-        val reallocateButton: Button = findViewById(R.id.reallocateButton)
         val voiceInputButton: Button = findViewById(R.id.voiceInputButton)
         val manualInputButton: Button = findViewById(R.id.manualInputButton)
 
@@ -65,11 +64,6 @@ class ExpenseCheckActivity : AppCompatActivity() {
         // 手動入力ボタンの動作
         manualInputButton.setOnClickListener {
             showManualInputDialog()
-        }
-
-        // 再分配ボタンの動作
-        reallocateButton.setOnClickListener {
-            reallocateBudget()
         }
     }
 
