@@ -1,74 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.expense.ExpenseCheckActivity">
+    android:layout_height="match_parent">
 
-    <!-- 今日の日付のTextView -->
+    <!-- 今日の日付を表示 -->
     <TextView
         android:id="@+id/todayDateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2024年12月23日"
-        android:textSize="24sp"
-    android:layout_marginBottom="24dp"
-    app:layout_constraintBottom_toTopOf="@+id/todaySpendingTextView"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        android:text="今日の日付"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"/>
 
-    <!-- 今日の支出額 -->
-    <TextView
-        android:id="@+id/todaySpendingTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="¥0"
-        android:textSize="30sp"
-    android:textColor="@android:color/black"
-    android:layout_marginBottom="24dp"
-    app:layout_constraintBottom_toTopOf="@+id/todayBudgetTextView"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/todayDateTextView" />
-
-    <!-- 今日の予算 -->
+    <!-- 今日の予算を表示 -->
     <TextView
         android:id="@+id/todayBudgetTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="今日の予算: ¥0"
-        android:textSize="24sp"
-    android:textColor="@android:color/black"
-    android:layout_marginBottom="40dp"
-    app:layout_constraintBottom_toTopOf="@+id/voiceInputButton"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/todaySpendingTextView" />
+        android:text="今日の予算"
+        android:textSize="16sp"
+        android:layout_below="@id/todayDateTextView"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- 今日の支出額を表示 -->
+    <TextView
+        android:id="@+id/todaySpendingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="今日の支出"
+        android:textSize="16sp"
+        android:layout_below="@id/todayBudgetTextView"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- 日付を選択するためのTextView -->
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="選択された日付"
+        android:textSize="16sp"
+        android:layout_below="@id/todaySpendingTextView"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- 日付選択ボタン -->
+    <Button
+        android:id="@+id/selectDateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="日付を選択"
+        android:layout_below="@id/dateTextView"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- 再分配ボタン -->
+    <Button
+        android:id="@+id/reallocateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="予算再分配"
+        android:layout_below="@id/selectDateButton"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
 
     <!-- 音声入力ボタン -->
     <Button
         android:id="@+id/voiceInputButton"
-        android:layout_width="200dp"
-    android:layout_height="60dp"
-    android:text="音声入力"
-    android:textSize="18sp"
-    app:layout_constraintBottom_toTopOf="@+id/manualInputButton"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/todayBudgetTextView" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="音声入力"
+        android:layout_below="@id/reallocateButton"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
 
-
+    <!-- 手動入力ボタン -->
     <Button
         android:id="@+id/manualInputButton"
-        android:layout_width="200dp"
-    android:layout_height="60dp"
-    android:text="手動入力"
-    android:textSize="18sp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/voiceInputButton" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="手動入力"
+        android:layout_below="@id/voiceInputButton"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

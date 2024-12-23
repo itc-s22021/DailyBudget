@@ -1,5 +1,6 @@
 package com.example.dailybudget.ui.expense
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -32,6 +33,8 @@ class ExpenseCheckActivity : AppCompatActivity() {
         val todayBudgetTextView: TextView = findViewById(R.id.todayBudgetTextView)
         val voiceInputButton: Button = findViewById(R.id.voiceInputButton)
         val manualInputButton: Button = findViewById(R.id.manualInputButton)
+        val selectDateButton: Button = findViewById(R.id.selectDateButton)
+        val dateTextView: TextView = findViewById(R.id.dateTextView)
 
         // インテントからデータを取得
         dailyBudget = intent.getDoubleExtra("dailyBudget", 0.0)
@@ -64,6 +67,11 @@ class ExpenseCheckActivity : AppCompatActivity() {
         // 手動入力ボタンの動作
         manualInputButton.setOnClickListener {
             showManualInputDialog()
+        }
+
+        // 日付選択ボタンの動作
+        selectDateButton.setOnClickListener {
+            showDatePicker(dateTextView)
         }
     }
 
@@ -134,9 +142,20 @@ class ExpenseCheckActivity : AppCompatActivity() {
         }
     }
 
-    // 再分配ボタンの処理 (再分配のロジックを追加する場所)
-    private fun reallocateBudget() {
-        // 再分配のロジックをここに追加
-        Toast.makeText(this, "再分配の処理を実行", Toast.LENGTH_SHORT).show()
+    // 日付選択ダイアログを表示
+    private fun showDatePicker(dateTextView: TextView) {
+        val calendar = Calendar.getInstance()
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+                // 選択した日付を表示
+                val selectedDate = String.format("%d年%d月%d日", year, month + 1, dayOfMonth)
+                dateTextView.text = selectedDate
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.show()
     }
 }
