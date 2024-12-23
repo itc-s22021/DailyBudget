@@ -11,4 +11,9 @@
     <string name="redistributed_budget">再分配後の予算: ¥%1$d</string>
     <string name="budget_setting">予算設定</string>
     <string name="expense_check">支出確認</string>
+        <!-- 今日の支出 -->
+    <string name="today_spending">今日の支出: %1$.2f円</string>
+
+        <!-- 今日の予算 -->
+    <string name="today_budget">今日の予算: ¥%1$d</string>
 </resources>

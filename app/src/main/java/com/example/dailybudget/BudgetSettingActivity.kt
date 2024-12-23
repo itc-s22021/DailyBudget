@@ -25,6 +25,7 @@ class BudgetSettingActivity : AppCompatActivity() {
 
         val savedBudget = sharedPreferences.getString("budget", "")
         val savedSalaryDate = sharedPreferences.getString("salaryDate", "")
+        val savedPaymentOption = sharedPreferences.getString("paymentOption", "")
 
         if (!savedBudget.isNullOrEmpty()) {
             budgetInput.setText(savedBudget)
@@ -66,9 +67,10 @@ class BudgetSettingActivity : AppCompatActivity() {
 
             saveBudgetAndSalaryDate(budget, salaryDate)
 
-            // 分配金額を計算して表示
+            // 分配金額を計算して SharedPreferences に保存
             val dailyAmount = calculateDailyBudget(budget.toDouble(), salaryDate)
             if (dailyAmount != null) {
+                saveDailyBudgetToPreferences(dailyAmount)
                 Toast.makeText(this, "1日あたりの金額: ¥${"%.2f".format(dailyAmount)}", Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(this, "分配金額の計算に失敗しました", Toast.LENGTH_SHORT).show()
@@ -107,7 +109,7 @@ class BudgetSettingActivity : AppCompatActivity() {
         val isWeekend = dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
 
         val holidays = listOf(
-            "2024-01-01",
+            "2024-01-01",  // 祝日例
             "2024-02-11",
             "2024-02-23"
         )
@@ -124,10 +126,18 @@ class BudgetSettingActivity : AppCompatActivity() {
         builder.setTitle("給料日が土日祝の場合")
         builder.setItems(options) { _, which ->
             val selectedOption = options[which]
+            savePaymentOption(selectedOption)
             Toast.makeText(this, "$selectedOption が選択されました", Toast.LENGTH_SHORT).show()
         }
         builder.setCancelable(true)
         builder.show()
+    }
+
+    private fun savePaymentOption(option: String) {
+        val sharedPreferences = getSharedPreferences("BudgetPreferences", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("paymentOption", option)
+        editor.apply()
     }
 
     private fun saveBudgetAndSalaryDate(budget: String, salaryDate: String) {
@@ -135,6 +145,13 @@ class BudgetSettingActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.putString("budget", budget)
         editor.putString("salaryDate", salaryDate)
+        editor.apply()
+    }
+
+    private fun saveDailyBudgetToPreferences(dailyAmount: Double) {
+        val sharedPreferences = getSharedPreferences("BudgetPreferences", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putFloat("dailyAmount", dailyAmount.toFloat())
         editor.apply()
     }
 
@@ -146,7 +163,20 @@ class BudgetSettingActivity : AppCompatActivity() {
             return null // 給料日が過去の場合、計算しない
         }
 
-        val differenceInMillis = nextSalaryDate.time - currentDate.time
+        // 祝日や週末の前払い・後払いの選択に基づき残りの日数を調整
+        val paymentOption = getPaymentOption()
+        val adjustedSalaryDate = if (paymentOption == "前払い") {
+            // 給料日が前払いの場合、日数を前倒し
+            Calendar.getInstance().apply {
+                time = nextSalaryDate
+                add(Calendar.DAY_OF_MONTH, -1)  // 前日に設定
+            }.time
+        } else {
+            // 後払いはそのままで調整なし
+            nextSalaryDate
+        }
+
+        val differenceInMillis = adjustedSalaryDate.time - currentDate.time
         val daysUntilSalary = (differenceInMillis / (1000 * 60 * 60 * 24)).toInt()
 
         return if (daysUntilSalary > 0) {
@@ -154,6 +184,11 @@ class BudgetSettingActivity : AppCompatActivity() {
         } else {
             null
         }
+    }
+
+    private fun getPaymentOption(): String {
+        val sharedPreferences = getSharedPreferences("BudgetPreferences", MODE_PRIVATE)
+        return sharedPreferences.getString("paymentOption", "") ?: "後払い"  // デフォルトは後払い
     }
 
     private fun parseDate(dateString: String): Date? {
