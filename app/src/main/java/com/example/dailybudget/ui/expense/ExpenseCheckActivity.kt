@@ -20,16 +20,14 @@ class ExpenseCheckActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private var todaySpending: Double = 0.0
     private var dailyBudget: Double = 0.0
-    private var selectedDate: Calendar = Calendar.getInstance()  // 選択された日付を保持
+    private var selectedDate: Calendar = Calendar.getInstance()
 
-    // UI コンポーネントの宣言
     private lateinit var todayDateTextView: TextView
     private lateinit var todaySpendingTextView: TextView
     private lateinit var todayBudgetTextView: TextView
     private lateinit var voiceInputButton: Button
     private lateinit var manualInputButton: Button
 
-    // ActivityResultContracts のセットアップ
     private val speechRecognitionResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -44,52 +42,23 @@ class ExpenseCheckActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense_check)
 
-        // SharedPreferences の初期化
         sharedPreferences = getSharedPreferences("DailyBudgetPrefs", MODE_PRIVATE)
 
-        // UI コンポーネントを取得
         todayDateTextView = findViewById(R.id.todayDateTextView)
         todaySpendingTextView = findViewById(R.id.todaySpendingTextView)
         todayBudgetTextView = findViewById(R.id.todayBudgetTextView)
         voiceInputButton = findViewById(R.id.voiceInputButton)
         manualInputButton = findViewById(R.id.manualInputButton)
 
-        // インテントからデータを取得
         dailyBudget = intent.getDoubleExtra("dailyBudget", 0.0)
-        todaySpending = getSpendingForSelectedDate()  // 選択された日付の支出額を取得
-        val remainingBudget = dailyBudget - todaySpending // 今日の残り予算を計算
+        loadSpendingForDate(selectedDate)
 
-        // 今日の日付を表示
-        val dateFormat = SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
-        val todayDate = dateFormat.format(Date())
-        todayDateTextView.text = todayDate
-
-        // 今日の予算を表示（残り予算を表示）
-        todayBudgetTextView.text = "今日の予算: ¥${"%.0f".format(remainingBudget)}"
-
-        // 今日の支出額を表示 (小数点以下を切り捨て)
-        todaySpendingTextView.text = "¥${"%.0f".format(todaySpending)}"
-
-        // 支出額が予算を超えた場合、赤色に変更
-        updateSpendingTextColor()
-
-        // 音声入力ボタンの動作
-        voiceInputButton.setOnClickListener {
-            startVoiceRecognition()
-        }
-
-        // 手動入力ボタンの動作
-        manualInputButton.setOnClickListener {
-            showManualInputDialog()
-        }
-
-        // 日付テキストビューをクリックした際に日付選択ダイアログを表示
-        todayDateTextView.setOnClickListener {
-            showDatePickerDialog()
-        }
+        updateDateDisplay()
+        voiceInputButton.setOnClickListener { startVoiceRecognition() }
+        manualInputButton.setOnClickListener { showManualInputDialog() }
+        todayDateTextView.setOnClickListener { showDatePickerDialog() }
     }
 
-    // 音声認識を開始
     private fun startVoiceRecognition() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -97,7 +66,6 @@ class ExpenseCheckActivity : AppCompatActivity() {
         speechRecognitionResultLauncher.launch(intent)
     }
 
-    // 手動入力用ダイアログを表示
     private fun showManualInputDialog() {
         val editText = EditText(this)
         val dialog = android.app.AlertDialog.Builder(this)
@@ -118,78 +86,54 @@ class ExpenseCheckActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    // 支出額を更新し、予算を再計算
     private fun updateSpending(amount: Double) {
-        todaySpending += amount // 今日の支出額に追加
-        val remainingBudget = dailyBudget - todaySpending // 残り予算を計算
-
-        // SharedPreferences に更新した支出額を保存
-        saveSpendingForSelectedDate(todaySpending)
-
-        // 更新された支出額と予算を表示
-        todaySpendingTextView.text = "¥${"%.0f".format(todaySpending)}"
-        todayBudgetTextView.text = "今日の予算: ¥${"%.0f".format(remainingBudget)}"
-
-        // 支出額が予算を超えた場合、赤色に変更
-        updateSpendingTextColor()
+        todaySpending += amount
+        saveSpendingForDate(selectedDate, todaySpending)
+        updateRemainingBudget()
     }
 
-    // 支出額の色を変更
-    private fun updateSpendingTextColor() {
-        if (todaySpending > dailyBudget) {
-            todaySpendingTextView.setTextColor(resources.getColor(android.R.color.holo_red_dark))
-        } else {
-            todaySpendingTextView.setTextColor(resources.getColor(android.R.color.holo_green_dark))
+    private fun updateRemainingBudget() {
+        val remainingBudget = dailyBudget - todaySpending
+        todayBudgetTextView.text = "今日の予算: ¥${"%.0f".format(remainingBudget)}"
+        todaySpendingTextView.text = "¥${"%.0f".format(todaySpending)}"
+        todaySpendingTextView.setTextColor(
+            resources.getColor(
+                if (todaySpending > dailyBudget) android.R.color.holo_red_dark else android.R.color.holo_green_dark
+            )
+        )
+    }
+
+    private fun loadSpendingForDate(date: Calendar) {
+        todaySpending = sharedPreferences.getFloat("spending_${date.timeInMillis}", 0.0f).toDouble()
+        updateRemainingBudget()
+    }
+
+    private fun saveSpendingForDate(date: Calendar, spending: Double) {
+        with(sharedPreferences.edit()) {
+            putFloat("spending_${date.timeInMillis}", spending.toFloat())
+            apply()
         }
     }
 
-    // 日付選択ダイアログを表示
     private fun showDatePickerDialog() {
         val dateSetListener =
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                 selectedDate.set(year, month, dayOfMonth)
+                loadSpendingForDate(selectedDate)
                 updateDateDisplay()
-                updateSpendingForSelectedDate()
             }
 
-        // 現在の日付を選択肢として表示
-        val datePickerDialog = DatePickerDialog(
+        DatePickerDialog(
             this,
             dateSetListener,
             selectedDate.get(Calendar.YEAR),
             selectedDate.get(Calendar.MONTH),
             selectedDate.get(Calendar.DAY_OF_MONTH)
-        )
-        datePickerDialog.show()
+        ).show()
     }
 
-    // 選択した日付を表示
     private fun updateDateDisplay() {
         val dateFormat = SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
         todayDateTextView.text = dateFormat.format(selectedDate.time)
-    }
-
-    // 選択した日付に基づいて支出額を更新
-    private fun updateSpendingForSelectedDate() {
-        // 日付に関連する支出額の管理を行う処理を追加
-        todaySpending = getSpendingForSelectedDate()
-        todaySpendingTextView.text = "¥${"%.0f".format(todaySpending)}"
-        val remainingBudget = dailyBudget - todaySpending
-        todayBudgetTextView.text = "今日の予算: ¥${"%.0f".format(remainingBudget)}"
-    }
-
-    // 選択した日付の支出額を取得
-    private fun getSpendingForSelectedDate(): Double {
-        val dateKey = "spending_${selectedDate.timeInMillis}"
-        return sharedPreferences.getFloat(dateKey, 0.0f).toDouble()
-    }
-
-    // 選択した日付の支出額を保存
-    private fun saveSpendingForSelectedDate(amount: Double) {
-        val dateKey = "spending_${selectedDate.timeInMillis}"
-        with(sharedPreferences.edit()) {
-            putFloat(dateKey, amount.toFloat())
-            apply()
-        }
     }
 }
