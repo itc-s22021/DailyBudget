@@ -20,3 +20,12 @@
 3. 記録した金額に応じて予算が再分配される
 ## ライセンス
 MIT License
+
+## 環境情報
+- OS:　Linux
+- 開発ツール: Android Studio
+- 言語: Kotlin
+- Gradle: 8.x
+- ビルドツール: Android Gradle Plugin（AGP）8.x
+- データベース: Room, SharedPreferences
+- バージョン管理: Git
